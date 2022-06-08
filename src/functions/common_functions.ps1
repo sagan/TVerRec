@@ -768,48 +768,7 @@ function ShowToast {
 		[Parameter(Mandatory = $false)][Boolean] $local:toastSilent
 	)
 
-	if ($script:isWin) {
-		if ($local:toastSilent) { $local:toastSoundElement = '<audio silent="true" />' }
-		else { $local:toastSoundElement = '<audio src="ms-winsoundevent:Notification.Default" loop="false"/>' }
-		if (!($local:toastDuration)) { $local:toastDuration = 'short' }
-		$local:toastTitle = $script:appName
-		$local:toastAttribution = ''
-		$local:toastAppLogo = $script:toastAppLogo
-
-		if (-not ('Microsoft.Toolkit.Uwp.Notifications.ToastContentBuilder' -as [Type])) {
-			if ($PSEdition -eq 'Core') {
-				#For PowerShell Core v6.x & PowerShell v7+
-				Add-Type -Path (Join-Path $script:libDir 'win\core\Microsoft.Windows.SDK.NET.dll')
-				Add-Type -Path (Join-Path $script:libDir 'win\core\WinRT.Runtime.dll')
-				Add-Type -Path (Join-Path $script:libDir 'win\core\Microsoft.Toolkit.Uwp.Notifications.dll')
-			} else {
-				#For Windows PowerShell and Windows PowerShell_ISE
-				Add-Type -Path (Join-Path $script:libDir 'win\desktop\Microsoft.Toolkit.Uwp.Notifications.dll')
-			}
-		}
-
-		$local:toastProgressContent = @"
-<?xml version="1.0" encoding="utf-8"?>
-<toast duration="$($local:toastDuration)">
-	<visual>
-		<binding template="ToastGeneric">
-			<text>$($local:toastTitle)</text>
-			<text>$($local:toastText1)</text>
-			<text>$($local:toastText2)</text>
-			<image placement="appLogoOverride" hint-crop="circle" src="$($local:toastAppLogo)"/>
-			<text placement="attribution">$($local:toastAttribution)</text>
-		</binding>
-	</visual>
-	$local:toastSoundElement
-</toast>
-"@
-
-		$local:appID = Get-WindowsAppId
-		$local:toastXML = New-Object Windows.Data.Xml.Dom.XmlDocument
-		$local:toastXML.LoadXml($script:toastProgressContent)
-		$local:toastBody = New-Object Windows.UI.Notifications.ToastNotification $local:toastXML
-		[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($local:appID).Show($local:toastBody) | Out-Null
-	}
+	Write-ColorOutput "$local:toastText1 | $local:toastText2"
 }
 
 
@@ -828,58 +787,7 @@ function ShowProgressToast {
 		[Parameter(Mandatory = $false)][Boolean] $local:toastSilent
 	)
 
-	if ($script:isWin) {
-		if ($local:toastSilent) { $local:toastSoundElement = '<audio silent="true" />' }
-		else { $local:toastSoundElement = '<audio src="ms-winsoundevent:Notification.Default" loop="false"/>' }
-		if (!($local:toastDuration)) { $local:toastDuration = 'short' }
-		$local:toastTitle = $script:appName
-		$local:toastAttribution = ''
-		$local:toastAppLogo = $script:toastAppLogo
-
-		if (-not ('Microsoft.Toolkit.Uwp.Notifications.ToastContentBuilder' -as [Type])) {
-			if ($PSEdition -eq 'Core') {
-				#For PowerShell Core v6.x & PowerShell v7+
-				Add-Type -Path (Join-Path $script:libDir 'win\core\Microsoft.Windows.SDK.NET.dll')
-				Add-Type -Path (Join-Path $script:libDir 'win\core\WinRT.Runtime.dll')
-				Add-Type -Path (Join-Path $script:libDir 'win\core\Microsoft.Toolkit.Uwp.Notifications.dll')
-			} else {
-				#For Windows PowerShell and Windows PowerShell_ISE
-				Add-Type -Path (Join-Path $script:libDir 'win\desktop\Microsoft.Toolkit.Uwp.Notifications.dll')
-			}
-		}
-
-		$local:toastContent = @"
-<?xml version="1.0" encoding="utf-8"?>
-<toast duration="$($local:toastDuration)">
-	<visual>
-		<binding template="ToastGeneric">
-			<text>$($local:toastTitle)</text>
-			<text>$($local:toastText1)</text>
-			<text>$($local:toastText2)</text>
-			<image placement="appLogoOverride" hint-crop="circle" src="$($local:toastAppLogo)"/>
-			<progress value="{progressValue}" title="{progressTitle}" valueStringOverride="{progressValueString}" status="{progressStatus}" />
-			<text placement="attribution">$($local:toastAttribution)</text>
-		</binding>
-	</visual>
-	$local:toastSoundElement
-</toast>
-"@
-
-		$local:appID = Get-WindowsAppId
-		$local:toastXML = New-Object Windows.Data.Xml.Dom.XmlDocument
-		$local:toastXML.LoadXml($local:toastContent)
-		$local:toast = New-Object Windows.UI.Notifications.ToastNotification $local:toastXML
-		$local:toast.Tag = $local:toastTag
-		$local:toast.Group = $local:toastGroup
-		$local:toastData = New-Object 'system.collections.generic.dictionary[string,string]'
-		$local:toastData.add('progressTitle', $local:toastWorkDetail)
-		$local:toastData.add('progressValue', '')
-		$local:toastData.add('progressValueString', '')
-		$local:toastData.add('progressStatus', '')
-		$local:toast.Data = [Windows.UI.Notifications.NotificationData]::new($local:toastData)
-		$local:toast.Data.SequenceNumber = 1
-		[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($local:appID).Show($local:toast) | Out-Null
-	}
+	Write-ColorOutput "$local:toastText1 | $local:toastText2 | $local:toastWorkDetail"
 }
 
 #----------------------------------------------------------------------
@@ -896,17 +804,7 @@ function UpdateProgessToast {
 		[Parameter(Mandatory = $true)][String] $local:toastGroup
 	)
 
-	if ($script:isWin) {
-		$local:appID = Get-WindowsAppId
-		$local:toastData = New-Object 'system.collections.generic.dictionary[string,string]'
-		$local:toastData.add('progressTitle', $local:toastProgressTitle)
-		$local:toastData.add('progressValue', $local:toastProgressRatio)
-		$local:toastData.add('progressValueString', $local:toastRrightText)
-		$local:toastData.add('progressStatus', $local:toastLeftText)
-		$local:toastProgressData = [Windows.UI.Notifications.NotificationData]::new($local:toastData)
-		$local:toastProgressData.SequenceNumber = 2
-		[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($local:appID).Update($local:toastProgressData, $local:toastTag , $local:toastGroup) | Out-Null
-	}
+	Write-ColorOutput "$local:toastProgressTitle | $local:toastProgressRatio"
 }
 
 #----------------------------------------------------------------------
@@ -925,63 +823,7 @@ function ShowProgressToast2 {
 		[Parameter(Mandatory = $false)][Boolean] $local:toastSilent
 	)
 
-	if ($script:isWin) {
-		if ($local:toastSilent) { $local:toastSoundElement = '<audio silent="true" />' }
-		else { $local:toastSoundElement = '<audio src="ms-winsoundevent:Notification.Default" loop="false"/>' }
-		if (!($local:toastDuration)) { $local:toastDuration = 'short' }
-		$local:toastTitle = $script:appName
-		$local:toastAttribution = ''
-		$local:toastAppLogo = $script:toastAppLogo
-
-		if (-not ('Microsoft.Toolkit.Uwp.Notifications.ToastContentBuilder' -as [Type])) {
-			if ($PSEdition -eq 'Core') {
-				#For PowerShell Core v6.x & PowerShell v7+
-				Add-Type -Path (Join-Path $script:libDir 'win\core\Microsoft.Windows.SDK.NET.dll')
-				Add-Type -Path (Join-Path $script:libDir 'win\core\WinRT.Runtime.dll')
-				Add-Type -Path (Join-Path $script:libDir 'win\core\Microsoft.Toolkit.Uwp.Notifications.dll')
-			} else {
-				#For Windows PowerShell and Windows PowerShell_ISE
-				Add-Type -Path (Join-Path $script:libDir 'win\desktop\Microsoft.Toolkit.Uwp.Notifications.dll')
-			}
-		}
-
-		$local:toastContent = @"
-<?xml version="1.0" encoding="utf-8"?>
-<toast duration="$($local:toastDuration)">
-	<visual>
-		<binding template="ToastGeneric">
-			<text>$($local:toastTitle)</text>
-			<text>$($local:toastText1)</text>
-			<text>$($local:toastText2)</text>
-			<image placement="appLogoOverride" hint-crop="circle" src="$($local:toastAppLogo)"/>
-			<progress value="{progressValue1}" title="{progressTitle1}" valueStringOverride="{progressValueString1}" status="{progressStatus1}" />
-			<progress value="{progressValue2}" title="{progressTitle2}" valueStringOverride="{progressValueString2}" status="{progressStatus2}" />
-			<text placement="attribution">$($local:toastAttribution)</text>
-		</binding>
-	</visual>
-	$local:toastSoundElement
-</toast>
-"@
-
-		$local:appID = Get-WindowsAppId
-		$local:toastXML = New-Object Windows.Data.Xml.Dom.XmlDocument
-		$local:toastXML.LoadXml($local:toastContent)
-		$local:toast = New-Object Windows.UI.Notifications.ToastNotification $local:toastXML
-		$local:toast.Tag = $local:toastTag
-		$local:toast.Group = $local:toastGroup
-		$local:toastData = New-Object 'system.collections.generic.dictionary[string,string]'
-		$local:toastData.add('progressTitle1', $local:toastWorkDetail1)
-		$local:toastData.add('progressValue1', '')
-		$local:toastData.add('progressValueString1', '')
-		$local:toastData.add('progressStatus1', '')
-		$local:toastData.add('progressTitle2', $local:toastWorkDetail2)
-		$local:toastData.add('progressValue2', '')
-		$local:toastData.add('progressValueString2', '')
-		$local:toastData.add('progressStatus2', '')
-		$local:toast.Data = [Windows.UI.Notifications.NotificationData]::new($local:toastData)
-		$local:toast.Data.SequenceNumber = 1
-		[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($local:appID).Show($local:toast) | Out-Null
-	}
+	Write-ColorOutput "$local:toastText1 | $local:toastWorkDetail1 | $local:toastText2 | $local:toastWorkDetail2"
 }
 
 #----------------------------------------------------------------------
@@ -1002,21 +844,7 @@ function UpdateProgessToast2 {
 		[Parameter(Mandatory = $true)][String] $local:toastGroup
 	)
 
-	if ($script:isWin) {
-		$local:appID = Get-WindowsAppId
-		$local:toastData = New-Object 'system.collections.generic.dictionary[string,string]'
-		$local:toastData.add('progressTitle1', $local:toastProgressTitle1)
-		$local:toastData.add('progressValue1', $local:toastProgressRatio1)
-		$local:toastData.add('progressValueString1', $local:toastRrightText1)
-		$local:toastData.add('progressStatus1', $local:toastLeftText1)
-		$local:toastData.add('progressTitle2', $local:toastProgressTitle2)
-		$local:toastData.add('progressValue2', $local:toastProgressRatio2)
-		$local:toastData.add('progressValueString2', $local:toastRrightText2)
-		$local:toastData.add('progressStatus2', $local:toastLeftText2)
-		$local:toastProgressData = [Windows.UI.Notifications.NotificationData]::new($local:toastData)
-		$local:toastProgressData.SequenceNumber = 2
-		[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($local:appID).Update($local:toastProgressData, $local:toastTag , $local:toastGroup) | Out-Null
-	}
+	Write-ColorOutput "$local:toastProgressTitle1 | $local:toastProgressRatio1 | $local:toastProgressTitle2 | $local:toastProgressRatio2"
 }
 
 #----------------------------------------------------------------------
