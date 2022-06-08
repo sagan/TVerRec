@@ -610,7 +610,7 @@ function getVideoLinksFromKeyword ($local:keywordName) {
 #----------------------------------------------------------------------
 #TVerビデオダウンロードのメイン処理
 #----------------------------------------------------------------------
-function downloadTVerVideo ($script:keywordName, $script:videoPageURL, $script:videoLink) {
+function downloadTVerVideo ($script:keywordName, $script:videoPageURL, $script:videoLink, $script:force) {
 
 	$script:platformUID = '' ; $script:platformToken = ''
 	$script:videoName = '' ; $script:videoFilePath = '' ; $script:videoSeriesPageURL = ''
@@ -635,7 +635,7 @@ function downloadTVerVideo ($script:keywordName, $script:videoPageURL, $script:v
 	} catch { Write-ColorOutput 'リストを読み書きできなかったのでスキップしました' Green ; continue
 	} finally { $null = fileUnlock ($script:lockFilePath) }
 
-	if ( $null -ne $local:listMatch) { Write-ColorOutput '過去に処理したビデオです。スキップします' DarkGray ; continue }
+	if ( !$script:force -and $null -ne $local:listMatch) { Write-ColorOutput '過去に処理したビデオです。スキップします' DarkGray ; continue }
 
 	#TVerのAPIを叩いてビデオ情報取得
 	try {
