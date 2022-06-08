@@ -89,3 +89,10 @@ $script:ffmpegDecodeOption = ''							#ffmpegのデコードオプションを�
 #$script:ffmpegDecodeOption = '-hwaccel dxva2 -hwaccel_output_format dxva2_vld'					#Direct3D 9 : for Windows
 #$script:ffmpegDecodeOption = '-hwaccel cuda -hwaccel_output_format cuda'							#CUDA : for NVIDIA Graphic Cards
 #$script:ffmpegDecodeOption = '-hwaccel videotoolbox'												#VideoToolBox : for Macs
+
+# $script:confDir="."
+if ( Test-Path $(Join-Path $script:confDir 'config.ps1') ) {
+  $script:userConfFile = $(Convert-Path $(Join-Path $script:confDir 'config.ps1'))
+  Write-Host "load userConfigFile $script:userConfFile"
+  . $script:userConfFile
+}
