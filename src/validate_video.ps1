@@ -34,7 +34,8 @@ try {
 	if ($MyInvocation.MyCommand.CommandType -eq 'ExternalScript') {
 		$script:scriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 		$script:scriptName = Split-Path -Leaf -Path $MyInvocation.MyCommand.Definition
-	} else {
+	}
+ else {
 		$script:scriptRoot = Convert-Path .
 	}
 	Set-Location $script:scriptRoot
@@ -43,54 +44,30 @@ try {
 
 	#----------------------------------------------------------------------
 	#外部設定ファイル読み込み
-	if ($PSVersionTable.PSEdition -eq 'Desktop') {
-		$script:sysFile = $(Convert-Path $(Join-Path $script:confDir 'system_setting_5.ps1'))
-		$script:confFile = $(Convert-Path $(Join-Path $script:confDir 'user_setting_5.ps1'))
-		. $script:sysFile
-		. $script:confFile
-	} else {
-		$script:sysFile = $(Convert-Path $(Join-Path $script:confDir 'system_setting.ps1'))
-		$script:confFile = $(Convert-Path $(Join-Path $script:confDir 'user_setting.ps1'))
-		. $script:sysFile
-		. $script:confFile
-	}
+	$script:sysFile = $(Convert-Path $(Join-Path $script:confDir 'system_setting.ps1'))
+	$script:confFile = $(Convert-Path $(Join-Path $script:confDir 'user_setting.ps1'))
+	. $script:sysFile
+	. $script:confFile
 
 	#----------------------------------------------------------------------
 	#外部関数ファイルの読み込み
-	if ($PSVersionTable.PSEdition -eq 'Desktop') {
-		. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\common_functions_5.ps1'))
-		. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\tver_functions_5.ps1'))
-	} else {
-		. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\common_functions.ps1'))
-		. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\tver_functions.ps1'))
-	}
+	. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\common_functions.ps1'))
+	. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\tver_functions.ps1'))
 
 	#----------------------------------------------------------------------
 	#開発環境用に設定上書き
-	if ($PSVersionTable.PSEdition -eq 'Desktop') {
-		$script:devFunctionFile = $(Join-Path $script:devDir 'dev_funcitons_5.ps1')
-		$script:devConfFile = $(Join-Path $script:devDir 'dev_setting_5.ps1')
-		if (Test-Path $script:devFunctionFile) {
-			. $script:devFunctionFile
-			Write-ColorOutput '　開発ファイル用共通関数ファイルを読み込みました' white DarkGreen
-		}
-		if (Test-Path $script:devConfFile) {
-			. $script:devConfFile
-			Write-ColorOutput '　開発ファイル用設定ファイルを読み込みました' white DarkGreen
-		}
-	} else {
-		$script:devFunctionFile = $(Join-Path $script:devDir 'dev_funcitons.ps1')
-		$script:devConfFile = $(Join-Path $script:devDir 'dev_setting.ps1')
-		if (Test-Path $script:devFunctionFile) {
-			. $script:devFunctionFile
-			Write-ColorOutput '　開発ファイル用共通関数ファイルを読み込みました' white DarkGreen
-		}
-		if (Test-Path $script:devConfFile) {
-			. $script:devConfFile
-			Write-ColorOutput '　開発ファイル用設定ファイルを読み込みました' white DarkGreen
-		}
+	$script:devFunctionFile = $(Join-Path $script:devDir 'dev_funcitons.ps1')
+	$script:devConfFile = $(Join-Path $script:devDir 'dev_setting.ps1')
+	if (Test-Path $script:devFunctionFile) {
+		. $script:devFunctionFile
+		Write-ColorOutput '　開発ファイル用共通関数ファイルを読み込みました' white DarkGreen
 	}
-} catch { Write-Error '設定ファイルの読み込みに失敗しました' ; exit 1 }
+	if (Test-Path $script:devConfFile) {
+		. $script:devConfFile
+		Write-ColorOutput '　開発ファイル用設定ファイルを読み込みました' white DarkGreen
+	}
+}
+catch { Write-Error '設定ファイルの読み込みに失敗しました' ; exit 1 }
 
 #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #メイン処理
@@ -143,8 +120,11 @@ try {
 	| Where-Object { $_.videoValidated -eq '0' } `
 	| Where-Object { $_.videoPath -ne '-- IGNORED --' } `
 	| Select-Object 'videoPath'
-} catch { Write-ColorOutput 'リストの読み込みに失敗しました' Green
-} finally { $null = fileUnlock ($script:lockFilePath) }
+}
+catch {
+ Write-ColorOutput 'リストの読み込みに失敗しました' Green
+}
+finally { $null = fileUnlock ($script:lockFilePath) }
 
 
 if ($null -eq $local:videoLists) {
@@ -153,7 +133,8 @@ if ($null -eq $local:videoLists) {
 	Write-ColorOutput '----------------------------------------------------------------------'
 	Write-ColorOutput 'すべてのビデオをチェック済みです'
 	Write-ColorOutput '----------------------------------------------------------------------'
-} else {
+}
+else {
 	#======================================================================
 	#動画ファイルをチェック
 	Write-ColorOutput '----------------------------------------------------------------------'
@@ -173,7 +154,8 @@ if ($null -eq $local:videoLists) {
 	if ($script:forceSoftwareDecodeFlag -eq $true ) {
 		#ソフトウェアデコードを強制する場合
 		$local:decodeOption = ''
-	} else {
+	}
+ else {
 		if ($script:ffmpegDecodeOption -ne '') {
 			Write-ColorOutput '----------------------------------------------------------------------'
 			Write-ColorOutput 'ffmpegのデコードオプションが設定されてます'
@@ -204,7 +186,8 @@ if ($null -eq $local:videoLists) {
 			$local:secRemaining = ($local:secElapsed.TotalSeconds / $local:validateNum) * ($local:validateTotal - $local:validateNum)
 			$local:minRemaining = "$([String]([math]::Ceiling($local:secRemaining / 60)))分"
 			$local:progressRatio = $($local:validateNum / $local:validateTotal)
-		} else {
+		}
+		else {
 			$local:minRemaining = '計算中...'
 			$local:progressRatio = 0
 		}
@@ -256,8 +239,11 @@ try {
 	}
 	$local:videoLists `
 	| Export-Csv $script:listFilePath -NoTypeInformation -Encoding UTF8
-} catch { Write-ColorOutput 'リストの更新に失敗しました' Green
-} finally { $null = fileUnlock ($script:lockFilePath) }
+}
+catch {
+ Write-ColorOutput 'リストの更新に失敗しました' Green
+}
+finally { $null = fileUnlock ($script:lockFilePath) }
 
 #進捗表示
 UpdateProgessToast '動画のチェック' '1' '' '完了' "$($script:appName)" 'Validate'

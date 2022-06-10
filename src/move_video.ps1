@@ -56,29 +56,15 @@ try {
 
 	#----------------------------------------------------------------------
 	#開発環境用に設定上書き
-	if ($PSVersionTable.PSEdition -eq 'Desktop') {
-		$script:devFunctionFile = $(Join-Path $script:devDir 'dev_funcitons_5.ps1')
-		$script:devConfFile = $(Join-Path $script:devDir 'dev_setting_5.ps1')
-		if (Test-Path $script:devFunctionFile) {
-			. $script:devFunctionFile
-			Write-ColorOutput '　開発ファイル用共通関数ファイルを読み込みました' white DarkGreen
-		}
-		if (Test-Path $script:devConfFile) {
-			. $script:devConfFile
-			Write-ColorOutput '　開発ファイル用設定ファイルを読み込みました' white DarkGreen
-		}
+	$script:devFunctionFile = $(Join-Path $script:devDir 'dev_funcitons.ps1')
+	$script:devConfFile = $(Join-Path $script:devDir 'dev_setting.ps1')
+	if (Test-Path $script:devFunctionFile) {
+		. $script:devFunctionFile
+		Write-ColorOutput '　開発ファイル用共通関数ファイルを読み込みました' white DarkGreen
 	}
- else {
-		$script:devFunctionFile = $(Join-Path $script:devDir 'dev_funcitons.ps1')
-		$script:devConfFile = $(Join-Path $script:devDir 'dev_setting.ps1')
-		if (Test-Path $script:devFunctionFile) {
-			. $script:devFunctionFile
-			Write-ColorOutput '　開発ファイル用共通関数ファイルを読み込みました' white DarkGreen
-		}
-		if (Test-Path $script:devConfFile) {
-			. $script:devConfFile
-			Write-ColorOutput '　開発ファイル用設定ファイルを読み込みました' white DarkGreen
-		}
+	if (Test-Path $script:devConfFile) {
+		. $script:devConfFile
+		Write-ColorOutput '　開発ファイル用設定ファイルを読み込みました' white DarkGreen
 	}
 }
 catch { Write-Error '設定ファイルの読み込みに失敗しました' ; exit 1 }

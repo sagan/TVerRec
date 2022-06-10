@@ -45,15 +45,10 @@ for /f "tokens=2" %%i in ('tasklist /FI "WINDOWTITLE eq TVerRec" /NH') do set my
 echo %myPID% > %PIDFile% 2> nul
 
 :LOOP
-
-	rem 文字コードをWindows PowerShell用にUTF8-BOMなしファイルを作成する
-	powershell -Command "$allPosh5Files = @(Get-ChildItem -Path '../' -Recurse -File -Filter '*_5.ps1' ).FullName ; foreach ($posh5File in $allPosh5Files) { Remove-Item $posh5File -Force }" 2> nul
-	powershell -Command "$allPoshFiles = @(Get-ChildItem -Path '../' -Recurse -File -Filter '*.ps1' ).FullName ; foreach ($poshFile in $allPoshFiles) { $posh5File = $poshFile.Replace('.ps1' , '_5.ps1'); Get-Content -Encoding:utf8 $poshFile | Out-File -Encoding:utf8 $posh5File -Force }" 2>&1
-
 	if exist "C:\Program Files\PowerShell\7\pwsh.exe" (
 		pwsh -NoProfile -ExecutionPolicy Unrestricted ..\src\tverrec_bulk.ps1
 	) else (
-		powershell -NoProfile -ExecutionPolicy Unrestricted ..\src\tverrec_bulk_5.ps1
+		powershell -NoProfile -ExecutionPolicy Unrestricted ..\src\tverrec_bulk.ps1
 	)
 
 	goto :PROCESSCHECKER
@@ -77,15 +72,12 @@ echo %myPID% > %PIDFile% 2> nul
 		pwsh -NoProfile -ExecutionPolicy Unrestricted ..\src\move_video.ps1
 		pwsh -NoProfile -ExecutionPolicy Unrestricted ..\src\delete_trash.ps1
 	) else (
-		powershell -NoProfile -ExecutionPolicy Unrestricted ..\src\delete_trash_5.ps1
-		powershell -NoProfile -ExecutionPolicy Unrestricted ..\src\validate_video_5.ps1
-		powershell -NoProfile -ExecutionPolicy Unrestricted ..\src\validate_video_5.ps1
-		powershell -NoProfile -ExecutionPolicy Unrestricted ..\src\move_video_5.ps1
-		powershell -NoProfile -ExecutionPolicy Unrestricted ..\src\delete_trash_5.ps1
+		powershell -NoProfile -ExecutionPolicy Unrestricted ..\src\delete_trash.ps1
+		powershell -NoProfile -ExecutionPolicy Unrestricted ..\src\validate_video.ps1
+		powershell -NoProfile -ExecutionPolicy Unrestricted ..\src\validate_video.ps1
+		powershell -NoProfile -ExecutionPolicy Unrestricted ..\src\move_video.ps1
+		powershell -NoProfile -ExecutionPolicy Unrestricted ..\src\delete_trash.ps1
 	)
-
-	rem Windows PowerShell用に作成したUTF8-BOMなしファイルを削除する
-	powershell -Command "$allPosh5Files = @(Get-ChildItem -Path '../' -Recurse -File -Filter '*_5.ps1' ).FullName ; foreach ($posh5File in $allPosh5Files) { Remove-Item $posh5File -Force }" 2> nul
 
 	echo 終了するには Y と入力してください。何も入力しなければ処理を継続します。
 

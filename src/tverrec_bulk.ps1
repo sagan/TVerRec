@@ -35,7 +35,8 @@ try {
 	if ($MyInvocation.MyCommand.CommandType -eq 'ExternalScript') {
 		$script:scriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 		$script:scriptName = Split-Path -Leaf -Path $MyInvocation.MyCommand.Definition
-	} else {
+	}
+	else {
 		$script:scriptRoot = Convert-Path .
 	}
 	Set-Location $script:scriptRoot
@@ -44,54 +45,30 @@ try {
 
 	#----------------------------------------------------------------------
 	#外部設定ファイル読み込み
-	if ($PSVersionTable.PSEdition -eq 'Desktop') {
-		$script:sysFile = $(Convert-Path $(Join-Path $script:confDir 'system_setting_5.ps1'))
-		$script:confFile = $(Convert-Path $(Join-Path $script:confDir 'user_setting_5.ps1'))
-		. $script:sysFile
-		. $script:confFile
-	} else {
-		$script:sysFile = $(Convert-Path $(Join-Path $script:confDir 'system_setting.ps1'))
-		$script:confFile = $(Convert-Path $(Join-Path $script:confDir 'user_setting.ps1'))
-		. $script:sysFile
-		. $script:confFile
-	}
+	$script:sysFile = $(Convert-Path $(Join-Path $script:confDir 'system_setting.ps1'))
+	$script:confFile = $(Convert-Path $(Join-Path $script:confDir 'user_setting.ps1'))
+	. $script:sysFile
+	. $script:confFile
 
 	#----------------------------------------------------------------------
 	#外部関数ファイルの読み込み
-	if ($PSVersionTable.PSEdition -eq 'Desktop') {
-		. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\common_functions_5.ps1'))
-		. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\tver_functions_5.ps1'))
-	} else {
-		. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\common_functions.ps1'))
-		. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\tver_functions.ps1'))
-	}
+	. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\common_functions.ps1'))
+	. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\tver_functions.ps1'))
 
 	#----------------------------------------------------------------------
 	#開発環境用に設定上書き
-	if ($PSVersionTable.PSEdition -eq 'Desktop') {
-		$script:devFunctionFile = $(Join-Path $script:devDir 'dev_funcitons_5.ps1')
-		$script:devConfFile = $(Join-Path $script:devDir 'dev_setting_5.ps1')
-		if (Test-Path $script:devFunctionFile) {
-			. $script:devFunctionFile
-			Write-ColorOutput '　開発ファイル用共通関数ファイルを読み込みました' white DarkGreen
-		}
-		if (Test-Path $script:devConfFile) {
-			. $script:devConfFile
-			Write-ColorOutput '　開発ファイル用設定ファイルを読み込みました' white DarkGreen
-		}
-	} else {
-		$script:devFunctionFile = $(Join-Path $script:devDir 'dev_funcitons.ps1')
-		$script:devConfFile = $(Join-Path $script:devDir 'dev_setting.ps1')
-		if (Test-Path $script:devFunctionFile) {
-			. $script:devFunctionFile
-			Write-ColorOutput '　開発ファイル用共通関数ファイルを読み込みました' white DarkGreen
-		}
-		if (Test-Path $script:devConfFile) {
-			. $script:devConfFile
-			Write-ColorOutput '　開発ファイル用設定ファイルを読み込みました' white DarkGreen
-		}
+	$script:devFunctionFile = $(Join-Path $script:devDir 'dev_funcitons.ps1')
+	$script:devConfFile = $(Join-Path $script:devDir 'dev_setting.ps1')
+	if (Test-Path $script:devFunctionFile) {
+		. $script:devFunctionFile
+		Write-ColorOutput '　開発ファイル用共通関数ファイルを読み込みました' white DarkGreen
 	}
-} catch { Write-Error '設定ファイルの読み込みに失敗しました' ; exit 1 }
+	if (Test-Path $script:devConfFile) {
+		. $script:devConfFile
+		Write-ColorOutput '　開発ファイル用設定ファイルを読み込みました' white DarkGreen
+	}
+}
+catch { Write-Error '設定ファイルの読み込みに失敗しました' ; exit 1 }
 
 #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #メイン処理
@@ -118,7 +95,8 @@ $local:keywordNames = loadKeywordList			#ダウンロード対象ジャンルリ
 $local:keywordNum = 0						#キーワードの番号
 if ($script:keywordNames -is [array]) {
 	$local:keywordTotal = $script:keywordNames.Length	#トータルキーワード数
-} else { $local:keywordTotal = 1 }
+}
+else { $local:keywordTotal = 1 }
 
 #進捗表示
 ShowProgess2Row `
@@ -151,7 +129,8 @@ foreach ($local:keywordName in $local:keywordNames) {
 	$local:videoNum = 0						#ジャンル内の処理中のビデオの番号
 	if ($local:videoLinks -is [array]) {
 		$local:videoTotal = $local:videoLinks.Length	#ジャンル内のトータルビデオ数
-	} else { $local:videoTotal = 1 }
+	}
+ else { $local:videoTotal = 1 }
 
 	#処理時間の推計
 	$local:secElapsed = (Get-Date) - $local:totalStartTime
@@ -159,7 +138,8 @@ foreach ($local:keywordName in $local:keywordNames) {
 	if ($local:keywordNum -ne 0) {
 		$local:secRemaining1 = ($local:secElapsed.TotalSeconds / $local:keywordNum) * ($local:keywordTotal - $local:keywordNum)
 		$local:progressRatio1 = $($local:keywordNum / $local:keywordTotal)
-	} else {
+	}
+ else {
 		$local:progressRatio1 = 0
 	}
 	$local:progressRatio2 = 0
@@ -189,7 +169,8 @@ foreach ($local:keywordName in $local:keywordNames) {
 		#進捗率の計算
 		if ($local:keywordNum -ne 0) {
 			$local:progressRatio2 = $($local:videoNum / $local:videoTotal)
-		} else {
+		}
+		else {
 			$local:progressRatio2 = 0
 		}
 
