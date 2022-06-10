@@ -1,4 +1,4 @@
-###################################################################################
+﻿###################################################################################
 #  TVerRec : TVerビデオダウンローダ
 #
 #		共通関数スクリプト
@@ -32,11 +32,7 @@
 function checkLatestYtdl {
 	$progressPreference = 'silentlyContinue'
 	if ($script:disableUpdateYoutubedl -eq $false) {
-		if ($PSVersionTable.PSEdition -eq 'Desktop') {
-			. $(Convert-Path (Join-Path $scriptRoot '.\functions\update_ytdl-patched_5.ps1'))
-		} else {
-			. $(Convert-Path (Join-Path $scriptRoot '.\functions\update_ytdl-patched.ps1'))
-		}
+		. $(Convert-Path (Join-Path $scriptRoot '.\functions\update_ytdl-patched.ps1'))
 		if ($? -eq $false) { Write-Error 'youtube-dlの更新に失敗しました' ; exit 1 }
 	} else { }
 	$progressPreference = 'Continue'
@@ -48,11 +44,7 @@ function checkLatestYtdl {
 function checkLatestFfmpeg {
 	$progressPreference = 'silentlyContinue'
 	if ($script:disableUpdateFfmpeg -eq $false) {
-		if ($PSVersionTable.PSEdition -eq 'Desktop') {
-			. $(Convert-Path (Join-Path $scriptRoot '.\functions\update_ffmpeg_5.ps1'))
-		} else {
-			. $(Convert-Path (Join-Path $scriptRoot '.\functions\update_ffmpeg.ps1'))
-		}
+		. $(Convert-Path (Join-Path $scriptRoot '.\functions\update_ffmpeg.ps1'))
 		if ($? -eq $false) { Write-Error 'ffmpegの更新に失敗しました' ; exit 1 }
 	} else { }
 	$progressPreference = 'Continue'

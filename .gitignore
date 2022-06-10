@@ -53,6 +53,7 @@ win-*
 
 conf/config.ps1
 conf/keyword.conf
+db/tver.csv
 
 #ローカルの変更をGitHubにアップしないために
 #git update-index --assume-unchanged db/tver.csv

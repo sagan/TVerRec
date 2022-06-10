@@ -1,4 +1,4 @@
-###################################################################################
+﻿###################################################################################
 #  TVerRec : TVerビデオダウンローダ
 #
 #		無視対象ビデオ削除処理スクリプト
@@ -34,7 +34,8 @@ try {
 	if ($MyInvocation.MyCommand.CommandType -eq 'ExternalScript') {
 		$script:scriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 		$script:scriptName = Split-Path -Leaf -Path $MyInvocation.MyCommand.Definition
-	} else {
+	}
+ else {
 		$script:scriptRoot = Convert-Path .
 	}
 	Set-Location $script:scriptRoot
@@ -43,42 +44,19 @@ try {
 
 	#----------------------------------------------------------------------
 	#外部設定ファイル読み込み
-	if ($PSVersionTable.PSEdition -eq 'Desktop') {
-		$script:sysFile = $(Convert-Path $(Join-Path $script:confDir 'system_setting_5.ps1'))
-		$script:confFile = $(Convert-Path $(Join-Path $script:confDir 'user_setting_5.ps1'))
-		. $script:sysFile
-		. $script:confFile
-	} else {
-		$script:sysFile = $(Convert-Path $(Join-Path $script:confDir 'system_setting.ps1'))
-		$script:confFile = $(Convert-Path $(Join-Path $script:confDir 'user_setting.ps1'))
-		. $script:sysFile
-		. $script:confFile
-	}
+	$script:sysFile = $(Convert-Path $(Join-Path $script:confDir 'system_setting.ps1'))
+	$script:confFile = $(Convert-Path $(Join-Path $script:confDir 'user_setting.ps1'))
+	. $script:sysFile
+	. $script:confFile
 
 	#----------------------------------------------------------------------
 	#外部関数ファイルの読み込み
-	if ($PSVersionTable.PSEdition -eq 'Desktop') {
-		. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\common_functions_5.ps1'))
-		. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\tver_functions_5.ps1'))
-	} else {
-		. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\common_functions.ps1'))
-		. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\tver_functions.ps1'))
-	}
+	. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\common_functions.ps1'))
+	. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\tver_functions.ps1'))
 
 	#----------------------------------------------------------------------
 	#開発環境用に設定上書き
 	if ($PSVersionTable.PSEdition -eq 'Desktop') {
-		$script:devFunctionFile = $(Join-Path $script:devDir 'dev_funcitons_5.ps1')
-		$script:devConfFile = $(Join-Path $script:devDir 'dev_setting_5.ps1')
-		if (Test-Path $script:devFunctionFile) {
-			. $script:devFunctionFile
-			Write-ColorOutput '　開発ファイル用共通関数ファイルを読み込みました' white DarkGreen
-		}
-		if (Test-Path $script:devConfFile) {
-			. $script:devConfFile
-			Write-ColorOutput '　開発ファイル用設定ファイルを読み込みました' white DarkGreen
-		}
-	} else {
 		$script:devFunctionFile = $(Join-Path $script:devDir 'dev_funcitons.ps1')
 		$script:devConfFile = $(Join-Path $script:devDir 'dev_setting.ps1')
 		if (Test-Path $script:devFunctionFile) {
@@ -90,7 +68,20 @@ try {
 			Write-ColorOutput '　開発ファイル用設定ファイルを読み込みました' white DarkGreen
 		}
 	}
-} catch { Write-Error '設定ファイルの読み込みに失敗しました' ; exit 1 }
+ else {
+		$script:devFunctionFile = $(Join-Path $script:devDir 'dev_funcitons.ps1')
+		$script:devConfFile = $(Join-Path $script:devDir 'dev_setting.ps1')
+		if (Test-Path $script:devFunctionFile) {
+			. $script:devFunctionFile
+			Write-ColorOutput '　開発ファイル用共通関数ファイルを読み込みました' white DarkGreen
+		}
+		if (Test-Path $script:devConfFile) {
+			. $script:devConfFile
+			Write-ColorOutput '　開発ファイル用設定ファイルを読み込みました' white DarkGreen
+		}
+	}
+}
+catch { Write-Error '設定ファイルの読み込みに失敗しました' ; exit 1 }
 
 #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #メイン処理
@@ -102,12 +93,14 @@ try {
 	Get-ChildItem -Path $script:ffmpegErrorLogDir -Recurse -Filter 'ffmpeg_error_*.log' `
 	| Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-0.5) } `
 	| Remove-Item -Force -ErrorAction SilentlyContinue
-} catch { Write-ColorOutput 'ffmpegエラーファイルを削除できませんでした' Green }
+}
+catch { Write-ColorOutput 'ffmpegエラーファイルを削除できませんでした' Green }
 try {
 	Get-ChildItem -Path $scriptRoot -Recurse -Filter 'brightcovenew_*.lock' `
 	| Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-0.5) } `
 	| Remove-Item -Force -ErrorAction SilentlyContinue
-} catch { Write-ColorOutput 'youtube-dlのロックファイルを削除できませんでした' Green }
+}
+catch { Write-ColorOutput 'youtube-dlのロックファイルを削除できませんでした' Green }
 
 #======================================================================
 #1/3 ダウンロードが中断した際にできたゴミファイルは削除
@@ -175,7 +168,8 @@ $local:ignoreTitles = (Get-Content $script:ignoreFilePath -Encoding UTF8 `
 $local:ignoreNum = 0						#無視リスト内の番号
 if ($local:ignoreTitles -is [array]) {
 	$local:ignoreTotal = $local:ignoreTitles.Length	#無視リスト内のエントリ合計数
-} else { $local:ignoreTotal = 1 }
+}
+else { $local:ignoreTotal = 1 }
 
 #----------------------------------------------------------------------
 $local:totalStartTime = Get-Date
@@ -187,7 +181,8 @@ foreach ($local:ignoreTitle in $local:ignoreTitles) {
 		$local:secRemaining = ($local:secElapsed.TotalSeconds / $local:ignoreNum) * ($local:ignoreTotal - $local:ignoreNum)
 		$local:minRemaining = "$([String]([math]::Ceiling($local:secRemaining / 60)))分"
 		$local:progressRatio = $($local:ignoreNum / $local:ignoreTotal)
-	} else {
+	}
+ else {
 		$local:minRemaining = '計算中...'
 		$local:progressRatio = 0
 	}
@@ -208,7 +203,8 @@ foreach ($local:ignoreTitle in $local:ignoreTitles) {
 	try {
 		$local:delTargets = Get-ChildItem -LiteralPath $script:downloadBaseDir `
 			-Directory -Name -Filter "*$($local:ignoreTitle)*"
-	} catch { Write-ColorOutput '削除対象を特定できませんでした' Green }
+	}
+ catch { Write-ColorOutput '削除対象を特定できませんでした' Green }
 	try {
 		if ($null -ne $local:delTargets) {
 			foreach ($local:delTarget in $local:delTargets) {
@@ -218,8 +214,10 @@ foreach ($local:ignoreTitle in $local:ignoreTitles) {
 						-Recurse -Force -ErrorAction SilentlyContinue
 				}
 			}
-		} else { Write-ColorOutput '　削除対象はありませんでした' DarkGray }
-	} catch { Write-ColorOutput '削除できないファイルがありました' Green }
+		}
+		else { Write-ColorOutput '　削除対象はありませんでした' DarkGray }
+	}
+ catch { Write-ColorOutput '削除できないファイルがありました' Green }
 }
 #----------------------------------------------------------------------
 
@@ -241,7 +239,8 @@ $local:allSubDirs = @((Get-ChildItem -LiteralPath $script:downloadBaseDir -Recur
 $local:subDirNum = 0						#サブディレクトリの番号
 if ($local:allSubDirs -is [array]) {
 	$local:subDirTotal = $local:allSubDirs.Length	#サブディレクトリの合計数
-} else { $local:subDirTotal = 1 }
+}
+else { $local:subDirTotal = 1 }
 
 #----------------------------------------------------------------------
 $local:totalStartTime = Get-Date
@@ -253,7 +252,8 @@ foreach ($local:subDir in $local:allSubDirs) {
 		$local:secRemaining = ($local:secElapsed.TotalSeconds / $local:subDirNum) * ($local:subDirTotal - $local:subDirNum)
 		$local:minRemaining = "$([String]([math]::Ceiling($local:secRemaining / 60)))分"
 		$local:progressRatio = $($local:subDirNum / $local:subDirTotal)
-	} else {
+	}
+ else {
 		$local:minRemaining = '計算中...'
 		$local:progressRatio = 0
 	}
@@ -276,7 +276,8 @@ foreach ($local:subDir in $local:allSubDirs) {
 			Write-ColorOutput "  └「$($local:subDir)」を削除します"
 			Remove-Item -LiteralPath $local:subDir `
 				-Recurse -Force -ErrorAction SilentlyContinue
-		} catch { Write-ColorOutput "空フォルダの削除に失敗しました: $local:subDir" Green }
+		}
+		catch { Write-ColorOutput "空フォルダの削除に失敗しました: $local:subDir" Green }
 	}
 }
 #----------------------------------------------------------------------

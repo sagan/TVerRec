@@ -1,4 +1,4 @@
-###################################################################################
+﻿###################################################################################
 #  TVerRec : TVerビデオダウンローダ
 #
 #		動画移動処理スクリプト
@@ -34,7 +34,8 @@ try {
 	if ($MyInvocation.MyCommand.CommandType -eq 'ExternalScript') {
 		$script:scriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 		$script:scriptName = Split-Path -Leaf -Path $MyInvocation.MyCommand.Definition
-	} else {
+	}
+ else {
 		$script:scriptRoot = Convert-Path .
 	}
 	Set-Location $script:scriptRoot
@@ -43,27 +44,15 @@ try {
 
 	#----------------------------------------------------------------------
 	#外部設定ファイル読み込み
-	if ($PSVersionTable.PSEdition -eq 'Desktop') {
-		$script:sysFile = $(Convert-Path $(Join-Path $script:confDir 'system_setting_5.ps1'))
-		$script:confFile = $(Convert-Path $(Join-Path $script:confDir 'user_setting_5.ps1'))
-		. $script:sysFile
-		. $script:confFile
-	} else {
-		$script:sysFile = $(Convert-Path $(Join-Path $script:confDir 'system_setting.ps1'))
-		$script:confFile = $(Convert-Path $(Join-Path $script:confDir 'user_setting.ps1'))
-		. $script:sysFile
-		. $script:confFile
-	}
+	$script:sysFile = $(Convert-Path $(Join-Path $script:confDir 'system_setting.ps1'))
+	$script:confFile = $(Convert-Path $(Join-Path $script:confDir 'user_setting.ps1'))
+	. $script:sysFile
+	. $script:confFile
 
 	#----------------------------------------------------------------------
 	#外部関数ファイルの読み込み
-	if ($PSVersionTable.PSEdition -eq 'Desktop') {
-		. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\common_functions_5.ps1'))
-		. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\tver_functions_5.ps1'))
-	} else {
-		. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\common_functions.ps1'))
-		. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\tver_functions.ps1'))
-	}
+	. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\common_functions.ps1'))
+	. $(Convert-Path (Join-Path $script:scriptRoot '.\functions\tver_functions.ps1'))
 
 	#----------------------------------------------------------------------
 	#開発環境用に設定上書き
@@ -78,7 +67,8 @@ try {
 			. $script:devConfFile
 			Write-ColorOutput '　開発ファイル用設定ファイルを読み込みました' white DarkGreen
 		}
-	} else {
+	}
+ else {
 		$script:devFunctionFile = $(Join-Path $script:devDir 'dev_funcitons.ps1')
 		$script:devConfFile = $(Join-Path $script:devDir 'dev_setting.ps1')
 		if (Test-Path $script:devFunctionFile) {
@@ -90,7 +80,8 @@ try {
 			Write-ColorOutput '　開発ファイル用設定ファイルを読み込みました' white DarkGreen
 		}
 	}
-} catch { Write-Error '設定ファイルの読み込みに失敗しました' ; exit 1 }
+}
+catch { Write-Error '設定ファイルの読み込みに失敗しました' ; exit 1 }
 
 #━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #メイン処理
@@ -139,7 +130,8 @@ ShowProgressToast '動画の移動中' '　処理2/3 - 動画ファイルを移�
 $local:moveToPathNum = 0						#移動先パス番号
 if ($local:moveToPaths -is [array]) {
 	$local:moveToPathTotal = $local:moveToPaths.Length	#移動先パス合計数
-} else { $local:moveToPathTotal = 1 }
+}
+else { $local:moveToPathTotal = 1 }
 
 #----------------------------------------------------------------------
 $local:totalStartTime = Get-Date
@@ -152,7 +144,8 @@ foreach ($local:moveToPath in $local:moveToPaths.FullName) {
 		$local:secRemaining = ($local:secElapsed.TotalSeconds / $local:moveToPathNum) * ($local:moveToPathTotal - $local:moveToPathNum)
 		$local:minRemaining = "$([String]([math]::Ceiling($local:secRemaining / 60)))分"
 		$local:progressRatio = $($local:moveToPathNum / $local:moveToPathTotal)
-	} else {
+	}
+ else {
 		$local:minRemaining = '計算中...'
 		$local:progressRatio = 0
 	}
@@ -178,7 +171,8 @@ foreach ($local:moveToPath in $local:moveToPaths.FullName) {
 		Write-ColorOutput "  └「$($local:moveFromPath)」を移動します"
 		try {
 			Move-Item $local:moveFromPath -Destination $local:moveToPath -Force
-		} catch { Write-ColorOutput '移動できないファイルがありました' Green }
+		}
+		catch { Write-ColorOutput '移動できないファイルがありました' Green }
 	}
 }
 #----------------------------------------------------------------------
@@ -203,7 +197,8 @@ $local:allSubDirs = @((Get-ChildItem -Path $script:downloadBaseDir -Recurse).Whe
 $local:subDirNum = 0						#サブディレクトリの番号
 if ($local:allSubDirs -is [array]) {
 	$local:subDirTotal = $local:allSubDirs.Length	#サブディレクトリの合計数
-} else { $local:subDirTotal = 1 }
+}
+else { $local:subDirTotal = 1 }
 
 #----------------------------------------------------------------------
 $local:totalStartTime = Get-Date
@@ -215,7 +210,8 @@ foreach ($local:subDir in $local:allSubDirs) {
 		$local:secRemaining = ($local:secElapsed.TotalSeconds / $local:subDirNum) * ($local:subDirTotal - $local:subDirNum)
 		$local:minRemaining = "$([String]([math]::Ceiling($local:secRemaining / 60)))分"
 		$local:progressRatio = $($local:moveToPathNum / $local:moveToPathTotal)
-	} else {
+	}
+ else {
 		$local:minRemaining = '計算中...'
 		$local:progressRatio = 0
 	}
@@ -239,7 +235,8 @@ foreach ($local:subDir in $local:allSubDirs) {
 			Remove-Item `
 				-LiteralPath $local:subDir `
 				-Recurse -Force -ErrorAction SilentlyContinue
-		} catch { Write-ColorOutput "空フォルダの削除に失敗しました: $local:subDir" Green }
+		}
+		catch { Write-ColorOutput "空フォルダの削除に失敗しました: $local:subDir" Green }
 	}
 }
 #----------------------------------------------------------------------
